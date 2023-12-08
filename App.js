@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, FlatList, Alert } from 'react-native';
 import { AsyncStorage } from '@react-native-async-storage/async-storage';
 import * as SQLite from 'expo-sqlite';
-import styles from './App.css';
+import styles from './Styles.css';
 
 export default function App() {
   const [artist, setArtist] = useState('');
