@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-native';
+import { AsyncStorage } from '@react-native-async-storage/async-storage';
+import * as SQLite from 'expo-sqlite';
 
 export default function App() {
-  const [item, setItem] = useState('');
-  const [items, setItems] = useState([]);
+  const [artist, setArtist] = useState('');
+  const [title, setTitle] = useState('');
+  const [songs, setSongs] = useState([]);
 
   const handleAdd = () => {
     setItems([...items, { key: Math.random().toString(), value: item }]);
@@ -14,6 +17,14 @@ export default function App() {
   const handleClear = () => {
     setItems([]);
   };
+
+  readData = async () => {
+    try {
+      let value = await AsyncStorage.getItem('someKey');
+    } catch (error) {
+      Alert.alert('Error reading data');
+    }
+  }
 
   return (
     <View style={styles.container}>
