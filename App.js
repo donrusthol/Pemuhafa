@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, FlatList, Alert } from 'react-native';
 import { AsyncStorage } from '@react-native-async-storage/async-storage';
 import * as SQLite from 'expo-sqlite';
-import styles from './Styles.css';
+import { Header } from 'react-native/Libraries/NewAppScreen';
 
 export default function App() {
   const [artist, setArtist] = useState('');
@@ -53,6 +53,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <Text>Personal Music Hall of Fame</Text>
       <TextInput
         placeholder='Artist'
         onChangeText={artist => setArtist(artist)}
@@ -67,11 +68,43 @@ export default function App() {
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) =>
           <View style={styles.listcontainer}>
-            <Text>{item.artist},{item.title} </Text>
+            <Text>{artist} - {item.title} </Text>
             <Text style={{ color: '#0000ff' }} onPress={() => deleteItem(item.id)}>Delete</Text>
           </View>}
         data={songs}
       />
     </View>
   );
-};
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#dddddd',
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    padding: 100,
+  },
+  input: {
+    width: '80%',
+    borderColor: 'black',
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 10,
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '60%',
+    padding: 10,
+  },
+  listItem: {
+    padding: 60,
+    backgroundColor: '#ffffff',
+    borderColor: 'black',
+    borderWidth: 1,
+    marginBottom: 10,
+    marginTop: 60,
+    borderRadius: 5, // add a value for border-radius
+  },
+});
