@@ -1,82 +1,77 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, FlatList, Alert } from 'react-native';
 import { AsyncStorage } from '@react-native-async-storage/async-storage';
 import * as SQLite from 'expo-sqlite';
+import styles from './App.css';
 
 export default function App() {
   const [artist, setArtist] = useState('');
   const [title, setTitle] = useState('');
   const [songs, setSongs] = useState([]);
 
-  const handleAdd = () => {
-    setItems([...items, { key: Math.random().toString(), value: item }]);
-    setItem('');
-  };
+  const db = SQLite.openDatabase('SongDB.db');
 
-  const handleClear = () => {
-    setItems([]);
-  };
+  useEffect(() => {
+    db.transaction(tx => {
+      tx.executeSql('create table if not exists song (id integer primary key not null, artist text, title text);');
+    }, () => console.error("Error when creating DB"), updateList);
+  }, []);
 
   readData = async () => {
     try {
-      let value = await AsyncStorage.getItem('someKey');
+      let value = await AsyncStorage.getItem('key');
     } catch (error) {
       Alert.alert('Error reading data');
     }
   }
 
+  const saveItem = () => {
+    try {
+      db.transaction(tx => {
+        tx.executeSql('insert into song (artist, title) values (?, ?);',
+          [parseInt(artist), title]);
+      }, null, updateList)
+    } catch (error) {
+      Alert.alert('Error saving item')
+    }
+  }
+
+  const updateList = () => {
+    db.transaction(tx => {
+      tx.executeSql('select * from song;', [], (_, { rows }) =>
+        setSongs(rows._array)
+      );
+    }, null, null);
+  }
+
+  const deleteItem = (id) => {
+    db.transaction(
+      tx => tx.executeSql('delete from song where id = ?;', [id]), null, updateList
+    );
+  }
+
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.input}
-        placeholder="Artist - Song Title"
-        value={item}
-        onChangeText={setItem}
-      />
-      <View style={styles.buttons}>
-        <Button title="Add" onPress={handleAdd} />
-        <Button title="Clear" onPress={handleClear} />
-      </View>
+        placeholder='Artist'
+        onChangeText={artist => setArtist(artist)}
+        value={artist} />
+      <TextInput
+        placeholder='Song Title'
+        onChangeText={title => setTitle(title)}
+        value={title} />
+      <Button onPress={saveItem} title="Add" />
       <FlatList
-        data={items}
-        renderItem={itemData => (
-          <View style={styles.listItem}>
-            <Text>{itemData.item.value}</Text>
-          </View>
-        )}
+        style={{ marginLeft: "5%" }}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) =>
+          <View style={styles.listcontainer}>
+            <Text>{item.artist},{item.title} </Text>
+            <Text style={{ color: '#0000ff' }} onPress={() => deleteItem(item.id)}>Delete</Text>
+          </View>}
+        data={songs}
       />
-      <StatusBar style="auto" />
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 50,
-  },
-  input: {
-    width: '80%',
-    borderColor: 'black',
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 10,
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '60%',
-  },
-  listItem: {
-    padding: 10,
-    backgroundColor: '#ccc',
-    borderColor: 'black',
-    borderWidth: 1,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-});
+};

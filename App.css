@@ -1,0 +1,32 @@
+.container {
+    flex: 1;
+    background-color: #dddddd;
+    align-items: center;
+    justify-content: center;
+    padding: 100px;
+  }
+  
+  .input {
+    width: 80%;
+    border-color: black;
+    border-width: 1px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .buttons {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 60%;
+    padding: 10px;
+  }
+  
+  .listItem {
+    padding: 10px;
+    background-color: #ffffff;
+    border-color: black;
+    border-width: 1px;
+    margin-bottom: 10px;
+    border-radius: 5px; /* add a value for border-radius */
+  }
+  
