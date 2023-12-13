@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, FlatList, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, FlatList, Alert, Linking } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 
 export default function App() {
@@ -53,6 +53,10 @@ export default function App() {
     );
   }
 
+  const openYoutube = (videoId) => {
+    Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
+  }
+
   return (
     <View style={styles.container}>
       <Text>Personal Music Hall of Fame</Text>
@@ -72,7 +76,7 @@ export default function App() {
           <View style={styles.listcontainer}>
             <Text>{artist} - {item.title} </Text>
             <Text style={{ color: '#0000ff' }} onPress={() => deleteItem(item.id)}>Delete</Text>
-            <Button title="YouTube Search" onPress={() => openYoutube(youtubeResults[index])} />
+            <Text style={{ color: '#ff0000' }} onPress={() => openYoutube(youtubeResults[0])}>YouTube Search</Text>
           </View>}
         data={songs}
       />
