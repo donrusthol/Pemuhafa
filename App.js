@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, FlatList, Alert } from 'react-native';
-import { AsyncStorage } from '@react-native-async-storage/async-storage';
 import * as SQLite from 'expo-sqlite';
 
 export default function App() {
   const [artist, setArtist] = useState('');
   const [title, setTitle] = useState('');
   const [songs, setSongs] = useState([]);
+  const [youtubeResults, setYoutubeResults] = useState([]);
 
   const db = SQLite.openDatabase('SongDB.db');
 
@@ -15,14 +15,6 @@ export default function App() {
       tx.executeSql('create table if not exists song (id integer primary key not null, artist text, title text);');
     }, () => console.error("Error when creating DB"), updateList);
   }, []);
-
-  readData = async () => {
-    try {
-      let value = await AsyncStorage.getItem('key');
-    } catch (error) {
-      Alert.alert('Error reading data');
-    }
-  }
 
   const saveItem = () => {
     try {
@@ -40,7 +32,19 @@ export default function App() {
       tx.executeSql('select * from song;', [], (_, { rows }) =>
         setSongs(rows._array)
       );
-    }, null, null);
+    }, null, () => {
+      // Fetch YouTube search results based on each song title
+      const promises = songs.map(item => {
+        return fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${item.title}&key=AIzaSyAavvOPs-ZmyF_CrWw-DrilGoFLrfqvCnw`)
+          .then(response => response.json())
+          .then(data => data.items[0].id.videoId)
+          .catch(error => console.error('Error fetching YouTube data:', error));
+      });
+
+      Promise.all(promises)
+        .then(results => setYoutubeResults(results))
+        .catch(error => console.error('Error fetching YouTube data:', error));
+    });
   }
 
   const deleteItem = (id) => {
@@ -68,6 +72,7 @@ export default function App() {
           <View style={styles.listcontainer}>
             <Text>{artist} - {item.title} </Text>
             <Text style={{ color: '#0000ff' }} onPress={() => deleteItem(item.id)}>Delete</Text>
+            <Button title="YouTube Search" onPress={() => openYoutube(youtubeResults[index])} />
           </View>}
         data={songs}
       />
