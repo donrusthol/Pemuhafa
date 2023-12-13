@@ -75,8 +75,8 @@ export default function App() {
         renderItem={({ item }) =>
           <View style={styles.listcontainer}>
             <Text>{artist} - {item.title} </Text>
-            <Text style={{ color: '#0000ff' }} onPress={() => deleteItem(item.id)}>Delete</Text>
             <Text style={{ color: '#ff0000' }} onPress={() => openYoutube(youtubeResults[0])}>YouTube Search</Text>
+            <Text style={{ color: '#0000ff' }} onPress={() => deleteItem(item.id)}>Delete</Text>
           </View>}
         data={songs}
       />
